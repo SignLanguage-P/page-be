@@ -62,59 +62,42 @@ spring boot를 사용한 수화 학습용 웹 제작 프로젝트
 ## 프로젝트 구조
 
 ```
-project-root/
-├── backend/
-│   ├── src/
-│   │   └── main/
-│   │       ├── java/
-│   │       │   └── com/
-│   │       │       └── example/
-│   │       │           └── signlanguage/
-│   │       │               ├── config/
-│   │       │               ├── domain/
-│   │       │               │   ├── user/
-│   │       │               │   ├── word/
-│   │       │               │   ├── quiz/
-│   │       │               │   ├── category/
-│   │       │               │   └── progress/
-│   │       │               └── global/
-│   │       └── resources/
-│   ├── pom.xml
-│   └── README.md
-├── android/
-│   ├── app/
-│   │   ├── src/
-│   │   │   ├── main/
-│   │   │   │   ├── java/
-│   │   │   │   │   └── com/
-│   │   │   │   │       └── example/
-│   │   │   │   │           └── signlanguage/
-│   │   │   │   │               ├── ui/
-│   │   │   │   │               │   ├── home/
-│   │   │   │   │               │   ├── login/
-│   │   │   │   │               │   ├── word/
-│   │   │   │   │               │   ├── quiz/
-│   │   │   │   │               │   └── progress/
-│   │   │   │   │               ├── data/
-│   │   │   │   │               │   ├── model/
-│   │   │   │   │               │   ├── repository/
-│   │   │   │   │               │   └── api/
-│   │   │   │   │               └── util/
-│   │   │   │   ├── res/
-│   │   │   │   │   ├── layout/
-│   │   │   │   │   ├── drawable/
-│   │   │   │   │   ├── values/
-│   │   │   │   │   └── mipmap/
-│   │   │   │   └── AndroidManifest.xml
-│   │   │   └── test/
-│   │   ├── build.gradle
-│   │   └── proguard-rules.pro
-│   ├── gradle/
-│   ├── build.gradle
-│   ├── gradle.properties
-│   └── settings.gradle
-└── README.md
-
+src/main/java/com/example/p_project/
+├── domain/
+│   ├── category/
+│   │   ├── entity/
+│   │   ├── repository/
+│   │   ├── service/
+│   │   ├── dto/
+│   │   └── controller/
+│   ├── word/
+│   │   ├── entity/
+│   │   ├── repository/
+│   │   ├── service/
+│   │   ├── dto/
+│   │   └── controller/
+│   ├── quiz/
+│   │   ├── entity/
+│   │   ├── repository/
+│   │   ├── service/
+│   │   ├── dto/
+│   │   └── controller/
+│   └── user/
+│       ├── entity/
+│       ├── repository/
+│       ├── service/
+│       ├── dto/
+│       └── controller/
+└── global/
+    ├── common/
+    │   └── security/
+    │       ├── config/
+    │       ├── service/
+    │       └── model/
+    └── auth/
+        ├── controller/
+        ├── dto/
+        └── service/
 ```
 
 ## 구조 설명
