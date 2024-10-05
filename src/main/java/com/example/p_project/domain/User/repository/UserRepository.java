@@ -4,7 +4,7 @@ import com.example.p_project.domain.User.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository // 이 인터페이스가 리포지토리 빈임을 나타냅니다.
+@Repository // 이 인터페이스가 리포지토리 빈
 public interface UserRepository extends JpaRepository<User, Long> {
     // 사용자 이름으로 사용자를 찾는 메서드
     User findByUsername(String username);

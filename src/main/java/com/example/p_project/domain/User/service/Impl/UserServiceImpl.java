@@ -22,10 +22,10 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUsername(userRequestDTO.getUsername());
         user.setEmail(userRequestDTO.getEmail());
-        // 비밀번호를 암호화하여 저장합니다.
+        // 비밀번호를 암호화하여 저장
         user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
-        user.setRole("ROLE_USER"); // 기본 역할을 설정합니다.
-        user.setProgressLevel(0); // 초기 진행 수준을 설정합니다.
+        user.setRole("ROLE_USER"); // 기본 역할을 설정
+        user.setProgressLevel(0); // 초기 진행 수준을 설정
 
         User savedUser = userRepository.save(user);
         return convertToResponseDTO(savedUser);
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
-    // User 엔티티를 UserResponseDTO로 변환하는 private 메서드입니다.
+    // User 엔티티를 UserResponseDTO로 변환하는 private 메서드
     private UserResponseDTO convertToResponseDTO(User user) {
         UserResponseDTO dto = new UserResponseDTO();
         dto.setId(user.getId());

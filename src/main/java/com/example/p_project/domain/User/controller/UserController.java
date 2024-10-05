@@ -18,28 +18,28 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // 새로운 사용자를 등록하는 엔드포인트입니다.
+    // 새로운 사용자를 등록하는 엔드포인트
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRequestDTO userRequestDTO) {
         UserResponseDTO responseDTO = userService.registerUser(userRequestDTO);
         return ResponseEntity.ok(responseDTO);
     }
 
-    // 사용자 이름으로 사용자 정보를 조회하는 엔드포인트입니다.
+    // 사용자 이름으로 사용자 정보를 조회하는 엔드포인트
     @GetMapping("/{username}")
     public ResponseEntity<UserResponseDTO> getUser(@PathVariable String username) {
         UserResponseDTO responseDTO = userService.findByUsername(username);
         return responseDTO != null ? ResponseEntity.ok(responseDTO) : ResponseEntity.notFound().build();
     }
 
-    // 사용자 정보를 업데이트하는 엔드포인트입니다.
+    // 사용자 정보를 업데이트하는 엔드포인트
     @PutMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long userId, @RequestBody UserRequestDTO userRequestDTO) {
         UserResponseDTO responseDTO = userService.updateUser(userId, userRequestDTO);
         return ResponseEntity.ok(responseDTO);
     }
 
-    // 사용자를 삭제하는 엔드포인트입니다.
+    // 사용자를 삭제하는 엔드포인트
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
