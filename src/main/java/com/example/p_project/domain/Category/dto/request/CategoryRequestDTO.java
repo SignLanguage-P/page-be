@@ -1,4 +1,4 @@
-package com.example.p_project.domain.Category.dto.response;
+package com.example.p_project.domain.Category.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryResponseDTO {
-    private Long id;
+public class CategoryRequestDTO {
     private String name;
     private String description;
 }
