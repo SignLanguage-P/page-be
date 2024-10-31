@@ -15,5 +15,4 @@ public class WordResponseDTO {
     private String description;
     private String videoUrl;
     private String categoryName;
-
 }

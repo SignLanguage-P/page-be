@@ -63,4 +63,4 @@ public class WordController {
         return ResponseEntity.ok(words);
     }
 }
-}
+
