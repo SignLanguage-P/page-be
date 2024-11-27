@@ -63,41 +63,61 @@ spring boot를 사용한 수화 학습용 웹 제작 프로젝트
 
 ```
 src/main/java/com/example/p_project/
-├── domain/
-│   ├── category/
-│   │   ├── entity/
-│   │   ├── repository/
-│   │   ├── service/
-│   │   ├── dto/
-│   │   └── controller/
-│   ├── word/
-│   │   ├── entity/
-│   │   ├── repository/
-│   │   ├── service/
-│   │   ├── dto/
-│   │   └── controller/
-│   ├── quiz/
-│   │   ├── entity/
-│   │   ├── repository/
-│   │   ├── service/
-│   │   ├── dto/
-│   │   └── controller/
-│   └── user/
-│       ├── entity/
-│       ├── repository/
-│       ├── service/
-│       ├── dto/
-│       └── controller/
-└── global/
-    ├── common/
-    │   └── security/
-    │       ├── config/
-    │       ├── service/
-    │       └── model/
-    └── auth/
-        ├── controller/
-        ├── dto/
-        └── service/
+├── domain/                          # 도메인 계층
+│   ├── category/                    # 카테고리 도메인
+│   │   ├── entity/                 # 카테고리 엔티티
+│   │   ├── repository/             # 카테고리 레포지토리
+│   │   ├── service/                # 카테고리 서비스
+│   │   ├── dto/                    # 카테고리 DTO
+│   │   └── controller/             # 카테고리 컨트롤러
+│   │
+│   ├── word/                       # 단어 도메인
+│   │   ├── entity/                 # 단어 엔티티
+│   │   ├── repository/             # 단어 레포지토리
+│   │   ├── service/                # 단어 서비스
+│   │   ├── dto/                    # 단어 DTO
+│   │   └── controller/             # 단어 컨트롤러
+│   │
+│   ├── quiz/                       # 퀴즈 도메인
+│   │   ├── entity/                 # 퀴즈 엔티티
+│   │   ├── repository/             # 퀴즈 레포지토리
+│   │   ├── service/                # 퀴즈 서비스
+│   │   ├── dto/                    # 퀴즈 DTO
+│   │   └── controller/             # 퀴즈 컨트롤러
+│   │
+│   ├── user/                       # 사용자 도메인
+│   │   ├── entity/                 # 사용자 엔티티
+│   │   ├── repository/             # 사용자 레포지토리
+│   │   ├── service/                # 사용자 서비스
+│   │   ├── dto/                    # 사용자 DTO
+│   │   └── controller/             # 사용자 컨트롤러
+│   │
+│   └── model/                      # AI 모델 도메인
+│       ├── entity/                 # 모델 엔티티
+│       ├── repository/             # 모델 레포지토리
+│       ├── service/                # 모델 서비스
+│       ├── dto/                    # 모델 DTO
+│       └── controller/             # 모델 컨트롤러
+│
+└── global/                         # 전역 설정
+    ├── common/                     # 공통 기능
+    │   ├── security/              # 보안 설정
+    │   │   ├── config/           # 보안 설정
+    │   │   ├── service/          # 보안 서비스
+    │   │   └── model/           # 보안 모델
+    │   │
+    │   ├── exception/           # 예외 처리
+    │   ├── model/              # 모델 공통 설정
+    │   │   ├── config/
+    │   │   └── service/
+    │   │
+    │   └── util/              # 유틸리티
+    │
+    └── auth/                  # 인증 관련
+        ├── controller/        # 인증 컨트롤러
+        ├── dto/              # 인증 DTO
+        └── service/          # 인증 서비스
+
 ```
 
 ## 구조 설명
