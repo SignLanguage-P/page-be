@@ -4,7 +4,9 @@ import com.example.p_project.domain.Quiz.dto.response.QuizResponseDTO;
 import com.example.p_project.domain.Quiz.entity.Quiz;
 import com.example.p_project.domain.Quiz.repository.QuizRepository;
 import com.example.p_project.domain.Quiz.service.QuizService;
+import com.example.p_project.domain.Word.entity.Word;
 import com.example.p_project.domain.Word.repository.WordRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +20,15 @@ import java.util.stream.Collectors;
  * 퀴즈와 관련된 비즈니스 로직을 처리합니다.
  */
 @Service
+@Transactional
 public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final WordRepository wordRepository;
 
     /**
-     * 생성자를 통한 의존성 주입
-     * @param quizRepository 퀴즈 데이터 접근을 위한 리포지토리
-     * @param wordRepository 단어 데이터 접근을 위한 리포지토리
+     * QuizServiceImpl의 생성자입니다.
+     * @param quizRepository 퀴즈 레포지토리
+     * @param wordRepository 단어 레포지토리
      */
     @Autowired
     public QuizServiceImpl(QuizRepository quizRepository, WordRepository wordRepository) {
@@ -35,27 +38,37 @@ public class QuizServiceImpl implements QuizService {
 
     /**
      * 새로운 퀴즈를 생성합니다.
-     * @param quizRequestDTO 퀴즈 생성에 필요한 데이터를 담은 DTO
-     * @return 생성된 퀴즈의 정보를 담은 ResponseDTO
+     * @param quizRequestDTO 생성할 퀴즈의 정보를 담은 DTO
+     * @return 생성된 퀴즈의 정보를 담은 DTO
      * @throws RuntimeException 연관된 단어를 찾을 수 없는 경우
      */
     @Override
     public QuizResponseDTO createQuiz(QuizRequestDTO quizRequestDTO) {
-        Quiz quiz = new Quiz();
-        quiz.setWord(wordRepository.findById(quizRequestDTO.getWordId())
-                .orElseThrow(() -> new RuntimeException("Word not found")));
-        // 퀴즈 정보 설정
-        setQuizProperties(quiz, quizRequestDTO);
+        // 연관된 단어 조회
+        Word word = wordRepository.findById(quizRequestDTO.getWordId())
+                .orElseThrow(() -> new RuntimeException("Word not found"));
 
+        // 퀴즈 엔티티 생성
+        Quiz quiz = Quiz.builder()
+                .word(word)
+                .question(quizRequestDTO.getQuestion())
+                .correctAnswer(quizRequestDTO.getCorrectAnswer())
+                .option1(quizRequestDTO.getOption1())
+                .option2(quizRequestDTO.getOption2())
+                .option3(quizRequestDTO.getOption3())
+                .difficulty(quizRequestDTO.getDifficulty())
+                .build();
+
+        // 퀴즈 저장 및 응답 DTO 반환
         Quiz savedQuiz = quizRepository.save(quiz);
         return convertToResponseDTO(savedQuiz);
     }
 
     /**
-     * ID로 퀴즈를 조회합니다.
+     * 특정 ID의 퀴즈를 조회합니다.
      * @param id 조회할 퀴즈의 ID
-     * @return 조회된 퀴즈의 정보를 담은 ResponseDTO
-     * @throws RuntimeException 퀴즈를 찾을 수 없는 경우
+     * @return 조회된 퀴즈의 정보를 담은 DTO
+     * @throws RuntimeException 해당 ID의 퀴즈를 찾을 수 없는 경우
      */
     @Override
     public QuizResponseDTO getQuizById(Long id) {
@@ -66,7 +79,7 @@ public class QuizServiceImpl implements QuizService {
 
     /**
      * 모든 퀴즈를 조회합니다.
-     * @return 모든 퀴즈의 정보를 담은 ResponseDTO 리스트
+     * @return 모든 퀴즈의 정보를 담은 DTO 리스트
      */
     @Override
     public List<QuizResponseDTO> getAllQuizzes() {
@@ -77,28 +90,32 @@ public class QuizServiceImpl implements QuizService {
     }
 
     /**
-     * 기존 퀴즈를 수정합니다.
+     * 특정 ID의 퀴즈를 수정합니다.
      * @param id 수정할 퀴즈의 ID
-     * @param quizRequestDTO 수정할 퀴즈 정보를 담은 DTO
-     * @return 수정된 퀴즈의 정보를 담은 ResponseDTO
-     * @throws RuntimeException 퀴즈나 단어를 찾을 수 없는 경우
+     * @param quizRequestDTO 수정할 퀴즈의 새로운 정보를 담은 DTO
+     * @return 수정된 퀴즈의 정보를 담은 DTO
+     * @throws RuntimeException 해당 ID의 퀴즈나 연관된 단어를 찾을 수 없는 경우
      */
     @Override
     public QuizResponseDTO updateQuiz(Long id, QuizRequestDTO quizRequestDTO) {
+        // 기존 퀴즈 조회
         Quiz quiz = quizRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Quiz not found"));
 
+        // 연관된 단어 업데이트
         quiz.setWord(wordRepository.findById(quizRequestDTO.getWordId())
                 .orElseThrow(() -> new RuntimeException("Word not found")));
-        // 퀴즈 정보 업데이트
+
+        // 퀴즈 속성 업데이트
         setQuizProperties(quiz, quizRequestDTO);
 
+        // 퀴즈 저장 및 응답 DTO 반환
         Quiz updatedQuiz = quizRepository.save(quiz);
         return convertToResponseDTO(updatedQuiz);
     }
 
     /**
-     * 퀴즈를 삭제합니다.
+     * 특정 ID의 퀴즈를 삭제합니다.
      * @param id 삭제할 퀴즈의 ID
      */
     @Override
@@ -107,18 +124,23 @@ public class QuizServiceImpl implements QuizService {
     }
 
     /**
-     * 특정 카테고리와 난이도에서 랜덤하게 퀴즈를 선택합니다.
-     * @param category 퀴즈 카테고리
-     * @param difficulty 퀴즈 난이도
-     * @param count 선택할 퀴즈 개수
-     * @return 선택된 퀴즈들의 정보를 담은 ResponseDTO 리스트
+     * 특정 카테고리와 난이도에 해당하는 랜덤 퀴즈들을 조회합니다.
+     * @param category 조회할 퀴즈의 카테고리
+     * @param difficulty 조회할 퀴즈의 난이도
+     * @param count 조회할 퀴즈의 개수
+     * @return 랜덤하게 선택된 퀴즈들의 정보를 담은 DTO 리스트
      */
     @Override
     public List<QuizResponseDTO> getRandomQuizzes(String category, Quiz.Difficulty difficulty, int count) {
-        List<Quiz> quizzes = quizRepository.findByCategoryAndDifficulty(category, difficulty);
-        Collections.shuffle(quizzes);  // 퀴즈 목록을 랜덤하게 섞음
+        // 네이티브 쿼리를 통한 랜덤 퀴즈 조회
+        List<Quiz> quizzes = quizRepository.findRandomQuizzes(
+                category,
+                difficulty.name(),
+                count
+        );
+
+        // 퀴즈 엔티티들을 DTO로 변환하여 반환
         return quizzes.stream()
-                .limit(count)  // 요청된 개수만큼만 선택
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
     }
@@ -144,9 +166,9 @@ public class QuizServiceImpl implements QuizService {
     }
 
     /**
-     * Quiz 엔티티의 속성들을 설정합니다.
-     * @param quiz 속성을 설정할 Quiz 엔티티
-     * @param dto 설정할 속성값들을 담고 있는 DTO
+     * Quiz 엔티티의 속성들을 업데이트합니다.
+     * @param quiz 속성을 업데이트할 Quiz 엔티티
+     * @param dto 업데이트할 속성값들을 담고 있는 DTO
      */
     private void setQuizProperties(Quiz quiz, QuizRequestDTO dto) {
         quiz.setQuestion(dto.getQuestion());

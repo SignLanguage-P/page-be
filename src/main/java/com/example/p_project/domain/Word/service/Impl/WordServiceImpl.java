@@ -52,14 +52,15 @@ public class WordServiceImpl implements WordService {
      */
     @Override
     public WordResponseDTO createWord(WordRequestDTO wordRequestDTO) {
-        Word word = new Word();
-        word.setContent(wordRequestDTO.getContent());
-        word.setDescription(wordRequestDTO.getDescription());
-        word.setVideoUrl(wordRequestDTO.getVideoUrl());
-
         Category category = categoryRepository.findById(wordRequestDTO.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
-        word.setCategory(category);
+
+        Word word = Word.builder()
+                .content(wordRequestDTO.getContent())
+                .description(wordRequestDTO.getDescription())
+                .videoUrl(wordRequestDTO.getVideoUrl())
+                .category(category)
+                .build();
 
         Word savedWord = wordRepository.save(word);
         return convertToResponseDTO(savedWord);
