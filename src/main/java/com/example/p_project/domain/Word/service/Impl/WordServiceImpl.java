@@ -13,96 +13,149 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 단어 관련 비즈니스 로직을 구현하는 서비스 클래스입니다.
+ * WordService 인터페이스의 구현체로, 단어의 CRUD 작업과 검색 기능을 제공합니다.
+ */
 @Service
 public class WordServiceImpl implements WordService {
 
+    /**
+     * 단어 데이터 접근을 위한 레포지토리
+     */
     private final WordRepository wordRepository;
+
+    /**
+     * 카테고리 데이터 접근을 위한 레포지토리
+     */
     private final CategoryRepository categoryRepository;
 
+    /**
+     * WordServiceImpl 생성자
+     * 필요한 레포지토리들을 주입받습니다.
+     *
+     * @param wordRepository 단어 레포지토리
+     * @param categoryRepository 카테고리 레포지토리
+     */
     @Autowired
     public WordServiceImpl(WordRepository wordRepository, CategoryRepository categoryRepository) {
         this.wordRepository = wordRepository;
         this.categoryRepository = categoryRepository;
     }
 
+    /**
+     * 새로운 단어를 생성합니다.
+     *
+     * @param wordRequestDTO 생성할 단어 정보를 담은 DTO
+     * @return 생성된 단어의 정보를 담은 ResponseDTO
+     * @throws RuntimeException 카테고리를 찾을 수 없는 경우 발생
+     */
     @Override
     public WordResponseDTO createWord(WordRequestDTO wordRequestDTO) {
-        // 새로운 Word 엔티티 생성
         Word word = new Word();
-
-        // 기본 정보 설정
         word.setContent(wordRequestDTO.getContent());
         word.setDescription(wordRequestDTO.getDescription());
         word.setVideoUrl(wordRequestDTO.getVideoUrl());
 
-        // Category 설정 - Optional 처리 추가
         Category category = categoryRepository.findById(wordRequestDTO.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         word.setCategory(category);
 
-        // 저장 및 응답 변환
         Word savedWord = wordRepository.save(word);
         return convertToResponseDTO(savedWord);
     }
 
-
+    /**
+     * ID로 단어를 조회합니다.
+     *
+     * @param id 조회할 단어의 ID
+     * @return 조회된 단어 정보를 담은 ResponseDTO
+     * @throws RuntimeException 단어를 찾을 수 없는 경우 발생
+     */
     @Override
     public WordResponseDTO getWord(Long id) {
-        // ID로 단어 조회
         Word word = wordRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Word not found"));
         return convertToResponseDTO(word);
     }
 
+    /**
+     * 모든 단어를 조회합니다.
+     *
+     * @return 모든 단어 정보를 담은 ResponseDTO 리스트
+     */
     @Override
     public List<WordResponseDTO> getAllWords() {
-        // 모든 단어 조회 후 ResponseDTO 리스트로 변환
         return wordRepository.findAll().stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 기존 단어의 정보를 업데이트합니다.
+     *
+     * @param id 수정할 단어의 ID
+     * @param wordRequestDTO 수정할 단어 정보를 담은 DTO
+     * @return 수정된 단어 정보를 담은 ResponseDTO
+     * @throws RuntimeException 단어나 카테고리를 찾을 수 없는 경우 발생
+     */
     @Override
     public WordResponseDTO updateWord(Long id, WordRequestDTO wordRequestDTO) {
-        // 기존 단어 조회
         Word word = wordRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Word not found"));
 
-        // 단어 정보 업데이트
         word.setContent(wordRequestDTO.getContent());
         word.setDescription(wordRequestDTO.getDescription());
         word.setVideoUrl(wordRequestDTO.getVideoUrl());
         word.setCategory(categoryRepository.findById(wordRequestDTO.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found")));
 
-        // 저장 후 ResponseDTO로 변환하여 반환
         Word updatedWord = wordRepository.save(word);
         return convertToResponseDTO(updatedWord);
     }
 
+    /**
+     * ID로 단어를 삭제합니다.
+     *
+     * @param id 삭제할 단어의 ID
+     */
     @Override
     public void deleteWord(Long id) {
-        // ID로 단어 삭제
         wordRepository.deleteById(id);
     }
 
+    /**
+     * 특정 카테고리에 속한 단어들을 조회합니다.
+     *
+     * @param categoryId 조회할 카테고리의 ID
+     * @return 해당 카테고리의 단어들을 담은 ResponseDTO 리스트
+     */
     @Override
     public List<WordResponseDTO> getWordsByCategory(Long categoryId) {
-        // 카테고리 ID로 단어 목록 조회
         return wordRepository.findByCategoryId(categoryId).stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 키워드로 단어를 검색합니다.
+     *
+     * @param keyword 검색할 키워드
+     * @return 검색된 단어들을 담은 ResponseDTO 리스트
+     */
     @Override
     public List<WordResponseDTO> searchWords(String keyword) {
-        // 키워드로 단어 검색
         return wordRepository.findByContentContaining(keyword).stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
     }
 
-    // Word 엔티티를 WordResponseDTO로 변환하는 헬퍼 메소드
+    /**
+     * Word 엔티티를 WordResponseDTO로 변환합니다.
+     *
+     * @param word 변환할 Word 엔티티
+     * @return 변환된 WordResponseDTO
+     */
     private WordResponseDTO convertToResponseDTO(Word word) {
         return new WordResponseDTO(
                 word.getId(),
