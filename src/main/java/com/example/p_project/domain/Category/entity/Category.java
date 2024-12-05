@@ -19,6 +19,8 @@ import java.util.List;
 @Table(name = "categories")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Category {
@@ -33,6 +35,7 @@ public class Category {
     private String description;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Word> words = new ArrayList<>();
 
     @CreatedDate
@@ -44,6 +47,7 @@ public class Category {
     private LocalDateTime updatedAt;
 
     @Column(name = "is_deleted")
+    @Builder.Default
     private boolean isDeleted = false;
 
     /**
@@ -52,6 +56,20 @@ public class Category {
     @Builder
     public static Category createCategory(String name, String description) {
         Category category = new Category();
+        category.name = name;
+        category.description = description;
+        category.isDeleted = false;
+        category.words = new ArrayList<>();
+        return category;
+    }
+
+    /**
+     * 테스트용 정적 팩토리 메서드
+     */
+    @Builder(builderMethodName = "testBuilder")
+    public static Category createForTest(Long id, String name, String description) {
+        Category category = new Category();
+        category.id = id;
         category.name = name;
         category.description = description;
         category.isDeleted = false;
