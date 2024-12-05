@@ -27,36 +27,40 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * QuizService 구현체에 대한 단위 테스트
+ * QuizService 구현체에 대한 단위 테스트 클래스입니다.
+ * 퀴즈 관련 비즈니스 로직을 테스트합니다.
  */
 @ExtendWith(MockitoExtension.class)
 public class QuizServiceTest {
+    // Mockito를 사용하여 의존성을 모의(Mock) 객체로 대체
     @Mock
-    private QuizRepository quizRepository;
+    private QuizRepository quizRepository;  // 퀴즈 저장소 모의 객체
 
     @Mock
-    private WordRepository wordRepository;
+    private WordRepository wordRepository;  // 단어 저장소 모의 객체
 
     @InjectMocks
-    private QuizServiceImpl quizService;
+    private QuizServiceImpl quizService;    // 테스트 대상 서비스
 
-    private Category category;
-    private Word word;
-    private Quiz quiz;
-    private QuizRequestDTO quizRequestDTO;
+    // 테스트에 사용될 객체들
+    private Category category;  // 카테고리 객체
+    private Word word;         // 단어 객체
+    private Quiz quiz;         // 퀴즈 객체
+    private QuizRequestDTO quizRequestDTO;  // 퀴즈 생성/수정 요청 DTO
 
     /**
-     * 각 테스트 전에 실행되어 테스트에 필요한 데이터를 설정합니다.
+     * 각 테스트 메소드 실행 전에 실행되는 설정 메소드
+     * 테스트에 필요한 기본 데이터를 초기화합니다.
      */
     @BeforeEach
     void setUp() {
-        // 카테고리 설정
+        // 테스트용 카테고리 객체 생성
         category = Category.builder()
                 .name("테스트 카테고리")
                 .description("테스트 설명")
                 .build();
 
-        // 단어 설정
+        // 테스트용 단어 객체 생성
         word = Word.builder()
                 .content("테스트 단어")
                 .description("테스트 설명")
@@ -64,7 +68,7 @@ public class QuizServiceTest {
                 .videoUrl("https://example.com/video.mp4")
                 .build();
 
-        // 퀴즈 설정
+        // 테스트용 퀴즈 객체 생성
         quiz = Quiz.builder()
                 .word(word)
                 .question("테스트 질문")
@@ -75,7 +79,7 @@ public class QuizServiceTest {
                 .difficulty(Quiz.Difficulty.BEGINNER)
                 .build();
 
-        // 퀴즈 요청 DTO 설정
+        // 테스트용 퀴즈 요청 DTO 생성
         quizRequestDTO = new QuizRequestDTO();
         quizRequestDTO.setWordId(1L);
         quizRequestDTO.setQuestion("테스트 질문");
@@ -86,63 +90,79 @@ public class QuizServiceTest {
         quizRequestDTO.setDifficulty(Quiz.Difficulty.BEGINNER);
     }
 
+    /**
+     * 퀴즈 생성 기능을 테스트합니다.
+     * 새로운 퀴즈가 정상적으로 생성되는지 확인합니다.
+     */
     @Test
     @DisplayName("퀴즈 생성 테스트")
     void createQuizTest() {
-        // given
+        // given: 테스트 준비
         when(wordRepository.findById(any())).thenReturn(Optional.of(word));
         when(quizRepository.save(any(Quiz.class))).thenReturn(quiz);
 
-        // when
+        // when: 테스트 실행
         QuizResponseDTO result = quizService.createQuiz(quizRequestDTO);
 
-        // then
+        // then: 결과 검증
         assertThat(result).isNotNull();
         assertThat(result.getQuestion()).isEqualTo(quiz.getQuestion());
         assertThat(result.getCorrectAnswer()).isEqualTo(quiz.getCorrectAnswer());
         verify(quizRepository, times(1)).save(any(Quiz.class));
     }
 
+    /**
+     * ID로 퀴즈를 조회하는 기능을 테스트합니다.
+     * 특정 ID의 퀴즈가 정상적으로 조회되는지 확인합니다.
+     */
     @Test
     @DisplayName("ID로 퀴즈 조회 테스트")
     void getQuizByIdTest() {
-        // given
+        // given: 테스트 준비
         Long quizId = 1L;
         when(quizRepository.findById(quizId)).thenReturn(Optional.of(quiz));
 
-        // when
+        // when: 테스트 실행
         QuizResponseDTO result = quizService.getQuizById(quizId);
 
-        // then
+        // then: 결과 검증
         assertThat(result).isNotNull();
         assertThat(result.getQuestion()).isEqualTo(quiz.getQuestion());
         verify(quizRepository, times(1)).findById(quizId);
     }
 
+    /**
+     * 존재하지 않는 퀴즈 조회 시 예외 발생을 테스트합니다.
+     * 적절한 예외가 발생하는지 확인합니다.
+     */
     @Test
     @DisplayName("존재하지 않는 퀴즈 조회 시 예외 발생 테스트")
     void getQuizByIdNotFoundTest() {
-        // given
+        // given: 테스트 준비
         Long quizId = 999L;
         when(quizRepository.findById(quizId)).thenReturn(Optional.empty());
 
-        // when & then
+        // when & then: 테스트 실행 및 결과 검증
         assertThatThrownBy(() -> quizService.getQuizById(quizId))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Quiz not found");
     }
 
+    /**
+     * 모든 퀴즈 조회 기능을 테스트합니다.
+     * 전체 퀴즈 목록이 정상적으로 조회되는지 확인합니다.
+     */
     @Test
     @DisplayName("모든 퀴즈 조회 테스트")
     void getAllQuizzesTest() {
-        // given
-        List<Quiz> quizzes = List.of(quiz); // Arrays.asList 대신 List.of 사용
+        // given: 테스트 준비
+        List<Quiz> quizzes = List.of(quiz);
         when(quizRepository.findAll()).thenReturn(quizzes);
 
-        // when
+        // when: 테스트 실행
         List<QuizResponseDTO> results = quizService.getAllQuizzes();
 
-        // then
+        // then: 결과 검증
         assertThat(results)
                 .isNotNull()
                 .hasSize(1);
@@ -150,42 +170,54 @@ public class QuizServiceTest {
         verify(quizRepository).findAll();
     }
 
+    /**
+     * 퀴즈 업데이트 기능을 테스트합니다.
+     * 기존 퀴즈가 정상적으로 수정되는지 확인합니다.
+     */
     @Test
     @DisplayName("퀴즈 업데이트 테스트")
     void updateQuizTest() {
-        // given
+        // given: 테스트 준비
         Long quizId = 1L;
         when(quizRepository.findById(quizId)).thenReturn(Optional.of(quiz));
         when(wordRepository.findById(any())).thenReturn(Optional.of(word));
         when(quizRepository.save(any(Quiz.class))).thenReturn(quiz);
 
-        // when
+        // when: 테스트 실행
         QuizResponseDTO result = quizService.updateQuiz(quizId, quizRequestDTO);
 
-        // then
+        // then: 결과 검증
         assertThat(result).isNotNull();
         assertThat(result.getQuestion()).isEqualTo(quizRequestDTO.getQuestion());
         verify(quizRepository, times(1)).save(any(Quiz.class));
     }
 
+    /**
+     * 퀴즈 삭제 기능을 테스트합니다.
+     * 퀴즈가 정상적으로 삭제되는지 확인합니다.
+     */
     @Test
     @DisplayName("퀴즈 삭제 테스트")
     void deleteQuizTest() {
-        // given
+        // given: 테스트 준비
         Long quizId = 1L;
         doNothing().when(quizRepository).deleteById(quizId);
 
-        // when
+        // when: 테스트 실행
         quizService.deleteQuiz(quizId);
 
-        // then
+        // then: 결과 검증
         verify(quizRepository, times(1)).deleteById(quizId);
     }
 
+    /**
+     * 랜덤 퀴즈 조회 기능을 테스트합니다.
+     * 지정된 조건에 맞는 랜덤 퀴즈들이 정상적으로 조회되는지 확인합니다.
+     */
     @Test
     @DisplayName("랜덤 퀴즈 조회 테스트")
     void getRandomQuizzesTest() {
-        // given
+        // given: 테스트 준비
         String categoryName = "테스트 카테고리";
         Quiz.Difficulty difficulty = Quiz.Difficulty.BEGINNER;
         int count = 5;
@@ -197,10 +229,10 @@ public class QuizServiceTest {
                 eq(count)
         )).thenReturn(randomQuizzes);
 
-        // when
+        // when: 테스트 실행
         List<QuizResponseDTO> results = quizService.getRandomQuizzes(categoryName, difficulty, count);
 
-        // then
+        // then: 결과 검증
         assertThat(results)
                 .isNotNull()
                 .hasSize(1);
