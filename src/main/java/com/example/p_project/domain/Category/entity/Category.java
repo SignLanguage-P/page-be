@@ -47,14 +47,16 @@ public class Category {
     private boolean isDeleted = false;
 
     /**
-     * 카테고리 생성을 위한 생성자
+     * 카테고리 생성을 위한 정적 팩토리 메서드
      */
     @Builder
-    public Category(String name, String description) {
-        this.name = name;
-        this.description = description;
-        this.isDeleted = false;
-        this.words = new ArrayList<>();
+    public static Category createCategory(String name, String description) {
+        Category category = new Category();
+        category.name = name;
+        category.description = description;
+        category.isDeleted = false;
+        category.words = new ArrayList<>();
+        return category;
     }
 
     /**
