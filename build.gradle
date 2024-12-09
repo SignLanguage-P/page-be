@@ -19,8 +19,8 @@ configurations {
 	}
 }
 
-repositories {
-	mavenCentral()
+ext {
+	djlVersion = '0.25.0'  // DJL 버전 통일
 }
 
 dependencies {
@@ -52,6 +52,26 @@ dependencies {
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.7.0'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// DJL 의존성
+	implementation platform("ai.djl:bom:${djlVersion}")
+	implementation "ai.djl:api"
+	implementation "ai.djl:model-zoo"
+	implementation "ai.djl:basicdataset"
+
+	// DJL TensorFlow Engine
+	implementation "ai.djl.tensorflow:tensorflow-api:${djlVersion}"
+	implementation "ai.djl.tensorflow:tensorflow-engine:${djlVersion}"
+	implementation "ai.djl.tensorflow:tensorflow-model-zoo:${djlVersion}"
+
+	// TensorFlow 네이티브 라이브러리 (버전 수정)
+	runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:2.4.1"  // 버전 변경
+
+	// 이미지 처리
+	implementation 'org.apache.commons:commons-imaging:1.0-alpha2'
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
@@ -61,3 +81,23 @@ tasks.named('test') {
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
 }
+
+tasks.named('bootJar') {
+	archiveFileName = "${project.name}.jar"
+}
+
+// 의존성 버전 충돌 확인
+tasks.named('dependencies') {
+	doLast {
+		configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+			println "${artifact.name}:${artifact.version}"
+		}
+	}
+}
+
+// 메모리 설정 (선택사항)
+tasks.withType(JavaExec) {
+	jvmArgs = ['-Xmx4g']  // 최대 힙 메모리 4GB
+}
+
+

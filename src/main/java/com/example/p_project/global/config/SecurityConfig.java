@@ -25,29 +25,16 @@ public class SecurityConfig {
 
     // Spring Security의 필터 체인을 구성하는 메소드
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF(Cross-Site Request Forgery) 보안 기능 비활성화
-                // REST API 서버는 CSRF 공격으로부터 안전하므로 비활성화 가능
-                .csrf((csrf) -> csrf.disable())
+                .securityMatcher("/**")  // 모든 요청에 대해 이 설정을 적용
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()  // 모든 요청 허용
+                )
+                .csrf(csrf -> csrf.disable())  // CSRF 비활성화
+                .cors(cors -> cors.disable())  // CORS 비활성화
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()));  // Frame 옵션 비활성화
 
-                // HTTP 요청에 대한 접근 권한 설정
-                .authorizeHttpRequests((authorize) -> authorize
-                        // Swagger UI 관련 경로에 대한 접근 허용 설정
-                        .requestMatchers(
-                                // Swagger UI의 웹 페이지 접근 경로
-                                new AntPathRequestMatcher("/swagger-ui/**"),
-                                // Swagger API 문서 경로
-                                new AntPathRequestMatcher("/v3/api-docs/**"),
-                                // Swagger 리소스 경로
-                                new AntPathRequestMatcher("/swagger-resources/**")
-                        ).permitAll()  // 위의 경로들은 인증 없이 접근 가능
-
-                        // 위에서 설정한 경로 외의 모든 요청에 대해 인증 필요
-                        .anyRequest().authenticated()
-                );
-
-        // 구성된 SecurityFilterChain 객체 반환
         return http.build();
     }
 }
