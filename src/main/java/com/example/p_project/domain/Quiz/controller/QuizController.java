@@ -9,7 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 /**
  * 퀴즈 관리를 위한 REST API 컨트롤러
  * 퀴즈의 생성, 조회, 수정, 삭제 및 랜덤 퀴즈 선택 기능을 제공합니다.
@@ -101,12 +104,46 @@ public class QuizController {
      * @param count 조회할 퀴즈 개수 (기본값: 10)
      * @return ResponseEntity<List<QuizResponseDTO>> 조건에 맞는 랜덤 퀴즈 목록
      */
-    @GetMapping("/random")
-    public ResponseEntity<List<QuizResponseDTO>> getRandomQuizzes(
-            @RequestParam String category,
-            @RequestParam Quiz.Difficulty difficulty,
-            @RequestParam(defaultValue = "10") int count) {
-        List<QuizResponseDTO> quizzes = quizService.getRandomQuizzes(category, difficulty, count);
-        return ResponseEntity.ok(quizzes);
+
+
+//    @GetMapping("/random")
+//    public ResponseEntity<List<QuizResponseDTO>> getRandomQuizzes(
+//            @RequestParam String category,
+//            @RequestParam Quiz.Difficulty difficulty,
+//            @RequestParam(defaultValue = "10") int count) {
+//        List<QuizResponseDTO> quizzes = quizService.getRandomQuizzes(category, difficulty, count);
+//        return ResponseEntity.ok(quizzes);
+//    }
+
+    /**
+     * 난이도별 모든 퀴즈를 랜덤하게 조회합니다.
+     */
+    @GetMapping("/by-difficulty")
+    public ResponseEntity<Map<String, Object>> getQuizzesByDifficulty(
+            @RequestParam Quiz.Difficulty difficulty) {
+        List<QuizResponseDTO> quizzes = quizService.getAllQuizzesByDifficulty(difficulty);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("quizzes", quizzes);
+        response.put("totalQuizCount", quizzes.size());
+
+        return ResponseEntity.ok(response);
     }
+    //어디가 랜덤하게 되는거고 어떻게 데이터가 나오는지. 특히 count 부분이 무었을 의미하는지
+
+    /**
+     * 카테고리별 모든 퀴즈를 랜덤하게 조회합니다.
+     */
+    @GetMapping("/by-category")
+    public ResponseEntity<Map<String, Object>> getQuizzesByCategory(
+            @RequestParam String category) {
+        List<QuizResponseDTO> quizzes = quizService.getAllQuizzesByCategory(category);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("quizzes", quizzes);
+        response.put("totalQuizCount", quizzes.size());
+
+        return ResponseEntity.ok(response);
+    }
+
 }

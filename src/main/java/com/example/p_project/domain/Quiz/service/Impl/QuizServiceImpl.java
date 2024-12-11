@@ -27,6 +27,7 @@ public class QuizServiceImpl implements QuizService {
 
     /**
      * QuizServiceImpl의 생성자입니다.
+     *
      * @param quizRepository 퀴즈 레포지토리
      * @param wordRepository 단어 레포지토리
      */
@@ -38,6 +39,7 @@ public class QuizServiceImpl implements QuizService {
 
     /**
      * 새로운 퀴즈를 생성합니다.
+     *
      * @param quizRequestDTO 생성할 퀴즈의 정보를 담은 DTO
      * @return 생성된 퀴즈의 정보를 담은 DTO
      * @throws RuntimeException 연관된 단어를 찾을 수 없는 경우
@@ -66,6 +68,7 @@ public class QuizServiceImpl implements QuizService {
 
     /**
      * 특정 ID의 퀴즈를 조회합니다.
+     *
      * @param id 조회할 퀴즈의 ID
      * @return 조회된 퀴즈의 정보를 담은 DTO
      * @throws RuntimeException 해당 ID의 퀴즈를 찾을 수 없는 경우
@@ -79,6 +82,7 @@ public class QuizServiceImpl implements QuizService {
 
     /**
      * 모든 퀴즈를 조회합니다.
+     *
      * @return 모든 퀴즈의 정보를 담은 DTO 리스트
      */
     @Override
@@ -91,7 +95,8 @@ public class QuizServiceImpl implements QuizService {
 
     /**
      * 특정 ID의 퀴즈를 수정합니다.
-     * @param id 수정할 퀴즈의 ID
+     *
+     * @param id             수정할 퀴즈의 ID
      * @param quizRequestDTO 수정할 퀴즈의 새로운 정보를 담은 DTO
      * @return 수정된 퀴즈의 정보를 담은 DTO
      * @throws RuntimeException 해당 ID의 퀴즈나 연관된 단어를 찾을 수 없는 경우
@@ -116,6 +121,7 @@ public class QuizServiceImpl implements QuizService {
 
     /**
      * 특정 ID의 퀴즈를 삭제합니다.
+     *
      * @param id 삭제할 퀴즈의 ID
      */
     @Override
@@ -125,28 +131,30 @@ public class QuizServiceImpl implements QuizService {
 
     /**
      * 특정 카테고리와 난이도에 해당하는 랜덤 퀴즈들을 조회합니다.
-     * @param category 조회할 퀴즈의 카테고리
+     *
+     * @param category   조회할 퀴즈의 카테고리
      * @param difficulty 조회할 퀴즈의 난이도
-     * @param count 조회할 퀴즈의 개수
+     * @param count      조회할 퀴즈의 개수
      * @return 랜덤하게 선택된 퀴즈들의 정보를 담은 DTO 리스트
      */
-    @Override
-    public List<QuizResponseDTO> getRandomQuizzes(String category, Quiz.Difficulty difficulty, int count) {
-        // 네이티브 쿼리를 통한 랜덤 퀴즈 조회
-        List<Quiz> quizzes = quizRepository.findRandomQuizzes(
-                category,
-                difficulty.name(),
-                count
-        );
-
-        // 퀴즈 엔티티들을 DTO로 변환하여 반환
-        return quizzes.stream()
-                .map(this::convertToResponseDTO)
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<QuizResponseDTO> getRandomQuizzes(String category, Quiz.Difficulty difficulty, int count) {
+//        // 네이티브 쿼리를 통한 랜덤 퀴즈 조회
+//        List<Quiz> quizzes = quizRepository.findRandomQuizzes(
+//                category,
+//                difficulty.name(),
+//                count
+//        );
+//
+//        // 퀴즈 엔티티들을 DTO로 변환하여 반환
+//        return quizzes.stream()
+//                .map(this::convertToResponseDTO)
+//                .collect(Collectors.toList());
+//    }
 
     /**
      * Quiz 엔티티를 QuizResponseDTO로 변환합니다.
+     *
      * @param quiz 변환할 Quiz 엔티티
      * @return 변환된 QuizResponseDTO
      */
@@ -167,8 +175,9 @@ public class QuizServiceImpl implements QuizService {
 
     /**
      * Quiz 엔티티의 속성들을 업데이트합니다.
+     *
      * @param quiz 속성을 업데이트할 Quiz 엔티티
-     * @param dto 업데이트할 속성값들을 담고 있는 DTO
+     * @param dto  업데이트할 속성값들을 담고 있는 DTO
      */
     private void setQuizProperties(Quiz quiz, QuizRequestDTO dto) {
         quiz.setQuestion(dto.getQuestion());
@@ -177,5 +186,25 @@ public class QuizServiceImpl implements QuizService {
         quiz.setOption2(dto.getOption2());
         quiz.setOption3(dto.getOption3());
         quiz.setDifficulty(dto.getDifficulty());
+    }
+
+
+    //특정 난이도의 퀴즈들 중 지정된 개수만큼 랜덤하게 선택합니다.
+    @Override
+    public List<QuizResponseDTO> getAllQuizzesByDifficulty(Quiz.Difficulty difficulty) {
+        List<Quiz> quizzes = quizRepository.findByDifficulty(difficulty);
+        Collections.shuffle(quizzes); // 랜덤 정렬
+        return quizzes.stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<QuizResponseDTO> getAllQuizzesByCategory(String category) {
+        List<Quiz> quizzes = quizRepository.findByCategory(category);
+        Collections.shuffle(quizzes); // 랜덤 정렬
+        return quizzes.stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
     }
 }
