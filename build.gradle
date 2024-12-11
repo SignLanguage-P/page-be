@@ -19,15 +19,18 @@ configurations {
 	}
 }
 
-ext {
-	djlVersion = '0.25.0'  // DJL 버전 통일
-}
-
 dependencies {
 	// 스프링 부트 기본 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'  // WebClient 사용을 위해
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+	// Reactive 웹 클라이언트 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'io.projectreactor:reactor-core'
+	implementation 'io.projectreactor.netty:reactor-netty'
 
 	// MyBatis
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
@@ -53,25 +56,12 @@ dependencies {
 	testImplementation 'org.assertj:assertj-core:3.24.2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	// DJL 의존성
-	implementation platform("ai.djl:bom:${djlVersion}")
-	implementation "ai.djl:api"
-	implementation "ai.djl:model-zoo"
-	implementation "ai.djl:basicdataset"
-
-	// DJL TensorFlow Engine
-	implementation "ai.djl.tensorflow:tensorflow-api:${djlVersion}"
-	implementation "ai.djl.tensorflow:tensorflow-engine:${djlVersion}"
-	implementation "ai.djl.tensorflow:tensorflow-model-zoo:${djlVersion}"
-
-	// TensorFlow 네이티브 라이브러리 (버전 수정)
-	runtimeOnly "ai.djl.tensorflow:tensorflow-native-auto:2.4.1"  // 버전 변경
-
 	// 이미지 처리
 	implementation 'org.apache.commons:commons-imaging:1.0-alpha2'
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+	// JSON 처리
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {
@@ -99,5 +89,3 @@ tasks.named('dependencies') {
 tasks.withType(JavaExec) {
 	jvmArgs = ['-Xmx4g']  // 최대 힙 메모리 4GB
 }
-
-
