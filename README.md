@@ -29,33 +29,20 @@ spring boot를 사용한 수화 학습용 웹 제작 프로젝트
 
 ## 요구사항
 
-1. 회원 관리 시스템
 
-- 학습현황 표시
-- 로그인, 회원가입 구현
-- 권한 관리
-- 데이터베이스 설계 및 회원 테이블 생성
-
-2. 단어
+1. 단어
 
 - 카테고리별로 분류
 - 카테고리 조회 및 검색
 
-3. 진행률 확인
-
-- 단어 학습할 때마다 진행 상황 생성 및 업데이트
-- 특정 사용자의 진행 상황 조회
-- 학습 완료한 단어들 조회
-- 학습 완료 여부, 마지막 학습 시간, 학습 횟수
-
-4. 퀴즈
+2. 퀴즈
 
 - 난이도 (초급, 중급, 고급) 분류
 - 카테고리별로 분류
 - 카테고리와 난이도 선택해 랜덤 퀴즈 풀기 가능
-- 퀴즈는 사지선다형
+- 퀴즈는 컴퓨터 비전 기술 사용해 손짓 인식 후 문제 풀기 가능
 
-5. 카테고리
+3. 카테고리
 
 - 카테고리 CRUD
 
@@ -64,68 +51,70 @@ spring boot를 사용한 수화 학습용 웹 제작 프로젝트
 ```
 src/main/java/com/example/p_project/
 ├── domain/                          # 도메인 계층
-│   ├── category/                    # 카테고리 도메인
-│   │   ├── entity/                 # 카테고리 엔티티
-│   │   ├── repository/             # 카테고리 레포지토리
-│   │   ├── service/                # 카테고리 서비스
-│   │   ├── dto/                    # 카테고리 DTO
-│   │   └── controller/             # 카테고리 컨트롤러
+│   ├── Category/                    # 카테고리 도메인
+│   │   ├── controller/             # REST API 컨트롤러
+│   │   ├── dto/                    # 요청/응답 데이터 객체
+│   │   ├── entity/                 # JPA 엔티티
+│   │   ├── repository/             # JPA 레포지토리
+│   │   └── service/                # 비즈니스 로직
 │   │
-│   ├── word/                       # 단어 도메인
-│   │   ├── entity/                 # 단어 엔티티
-│   │   ├── repository/             # 단어 레포지토리
-│   │   ├── service/                # 단어 서비스
-│   │   ├── dto/                    # 단어 DTO
-│   │   └── controller/             # 단어 컨트롤러
+│   ├── Quiz/                        # 퀴즈 도메인
+│   │   ├── controller/
+│   │   ├── dto/
+│   │   ├── entity/
+│   │   ├── repository/
+│   │   └── service/
 │   │
-│   ├── quiz/                       # 퀴즈 도메인
-│   │   ├── entity/                 # 퀴즈 엔티티
-│   │   ├── repository/             # 퀴즈 레포지토리
-│   │   ├── service/                # 퀴즈 서비스
-│   │   ├── dto/                    # 퀴즈 DTO
-│   │   └── controller/             # 퀴즈 컨트롤러
+│   ├── SignLanguage/                # ai 모델 도메인
+│   │   ├── controller/
+│   │   ├── dto/
+│   │   ├── entity/
+│   │   ├── repository/
+│   │   └── service/
 │   │
-│   ├── user/                       # 사용자 도메인
-│   │   ├── entity/                 # 사용자 엔티티
-│   │   ├── repository/             # 사용자 레포지토리
-│   │   ├── service/                # 사용자 서비스
-│   │   ├── dto/                    # 사용자 DTO
-│   │   └── controller/             # 사용자 컨트롤러
-│   │
-│   └── model/                      # AI 모델 도메인
-│       ├── entity/                 # 모델 엔티티
-│       ├── repository/             # 모델 레포지토리
-│       ├── service/                # 모델 서비스
-│       ├── dto/                    # 모델 DTO
-│       └── controller/             # 모델 컨트롤러
+│   └── Word/                        # 단어 도메인
+│       ├── controller/
+│       ├── dto/
+│       ├── entity/
+│       ├── repository/
+│       └── service/
 │
-└── global/                         # 전역 설정
-    ├── common/                     # 공통 기능
-    │   ├── security/              # 보안 설정
-    │   │   ├── config/           # 보안 설정
-    │   │   ├── service/          # 보안 서비스
-    │   │   └── model/           # 보안 모델
-    │   │
-    │   ├── exception/           # 예외 처리
-    │   ├── model/              # 모델 공통 설정
-    │   │   ├── config/
-    │   │   └── service/
-    │   │
-    │   └── util/              # 유틸리티
-    │
-    └── auth/                  # 인증 관련
-        ├── controller/        # 인증 컨트롤러
-        ├── dto/              # 인증 DTO
-        └── service/          # 인증 서비스
+├── config/                          # 전역 설정
+│   └── WebClientConfig             # WebClient 설정
+│                                   # FastAPI 통신
+│
+└── global.config/                   # 글로벌 설정
+    ├── JpaConfig                    # JPA 설정
+    └── SecurityConfig              # 보안 설정
 
 ```
 
-## 구조 설명
+## 📌 Package 설명
 
-- `domain/`: 애플리케이션의 핵심 비즈니스 로직을 포함합니다.
-  - `category/`, `word/`, `quiz/`, `user/`: 각 도메인별 기능을 구현합니다.
-- `global/`: 애플리케이션 전반에 걸쳐 사용되는 공통 기능들을 포함합니다.
-  - `common/`: 공통 유틸리티, 설정 등을 포함합니다.
-  - `auth/`: 인증 관련 기능을 담당합니다.
+### **🔹 domain**
+
+애플리케이션의 핵심 비즈니스 로직을 포함하는 패키지입니다. 각 도메인 패키지는 다음과 같은 구조를 가집니다:
+
+- controller/: REST API 엔드포인트
+- dto/: 데이터 전송 객체
+- entity/: JPA 엔티티
+- repository/: 데이터 접근 계층
+- service/: 비즈니스 로직
+
+### **🔹 config**
+- WebClientConfig: FastAPI 서버와의 통신을 담당하는 설정
+- 수어 인식 AI 모델 서버와의 연동
+- 비동기 HTTP 통신 처리
+
+### **🔹 global**
+- JpaConfig: 데이터베이스 연결 설정
+- SecurityConfig: 보안 및 인증 설정
+
+## 🎯 설계 원칙
+- 도메인 주도 설계(DDD) 적용
+- 관심사 분리를 통한 유지보수성 향상
+- 도메인별 독립성 보장
+- 공통 기능의 재사용성 확보
+- MSA 고려 (FastAPI 서버 연동)
 
 이 구조는 도메인 중심 설계를 따르며, 관심사의 분리와 재사용성을 고려하여 설계되었습니다.
