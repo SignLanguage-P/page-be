@@ -46,18 +46,18 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
      * @param limit 조회할 퀴즈 개수
      * @return 조건에 맞는 랜덤 퀴즈 목록
      */
-    @Query(value = "SELECT q.* FROM quizzes q " +
-            "INNER JOIN words w ON q.word_id = w.id " +
-            "INNER JOIN categories c ON w.category_id = c.id " +
-            "WHERE c.name = :category AND q.difficulty = :difficulty " +
-            "ORDER BY RANDOM() " +
-            "LIMIT :limit",
-            nativeQuery = true)
-    List<Quiz> findRandomQuizzes(
-            @Param("category") String category,
-            @Param("difficulty") String difficulty,
-            @Param("limit") int limit
-    );
+//    @Query(value = "SELECT q.* FROM quizzes q " +
+//            "INNER JOIN words w ON q.word_id = w.id " +
+//            "INNER JOIN categories c ON w.category_id = c.id " +
+//            "WHERE c.name = :category AND q.difficulty = :difficulty " +
+//            "ORDER BY RANDOM() " +
+//            "LIMIT :limit",
+//            nativeQuery = true)
+//    List<Quiz> findRandomQuizzes(
+//            @Param("category") String category,
+//            @Param("difficulty") String difficulty,
+//            @Param("limit") int limit
+//    );
 
     /**
      * 특정 난이도에 해당하는 모든 퀴즈를 조회합니다.

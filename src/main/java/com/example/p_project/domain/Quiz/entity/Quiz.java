@@ -41,15 +41,36 @@ public class Quiz {
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
 
+
+
     public enum Difficulty {
         BEGINNER,
         INTERMEDIATE,
         ADVANCED
     }
 
+    // 퀴즈 유형 enum
+    public enum QuizType {
+        MULTIPLE_CHOICE("객관식"),
+        SIGN_VIDEO("수화 동작 맞추기"),
+        WORD_MATCHING("단어 연결하기"),
+        TRUE_FALSE("O/X");
+
+        private final String koreanName;
+
+        QuizType(String koreanName) {
+            this.koreanName = koreanName;
+        }
+
+        public String getKoreanName() {
+            return koreanName;
+        }
+    }
+
+
     @Builder
     public Quiz(Word word, String question, String correctAnswer,
-                String option1, String option2, String option3, Difficulty difficulty) {
+                String option1, String option2, String option3, Difficulty difficulty, QuizType quizType) {
         this.word = word;
         this.question = question;
         this.correctAnswer = correctAnswer;
